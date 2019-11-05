@@ -4,25 +4,19 @@ import pyautogui
 import threading
 
 
-def printit():
-    threading.Timer(5.0, printit).start()
+def startBot():
+    threading.Timer(0.3, startBot).start()
     px = ImageGrab.grab().load()
-    left = px[675, 655]
-    right = px[1245, 655]
-
+    
     colors = constant.COLORS
-    direction = "right"
+    direction = "left"
 
-    if left in colors:
-        print("left %s" % (left,))
-        direction = "right"
-    elif right in colors:
-        print("right %s" % (right,))
-        direction = "left"
-    else:
-        print("%s %s" % (left, right))
+    for y in range(675, 804, 6):
+        for x in range(650, 688, 6):
+            if px[x, y] in colors:
+                direction = "right"
 
     pyautogui.press(direction)
 
 
-printit()
+startBot()
