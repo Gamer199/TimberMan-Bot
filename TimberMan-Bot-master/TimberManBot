@@ -7,11 +7,8 @@ import threading
 def printit():
     threading.Timer(5.0, printit).start()
     px = ImageGrab.grab().load()
-    l = px[675, 655]
-    r = px[1245, 655]
-    left = px(675, 650, 129, 33)
-    right = px(1133, 635, 130, 49)
-    print(left)
+    left = px[675, 655]
+    right = px[1245, 655]
 
     colors = constant.COLORS
     direction = "right"

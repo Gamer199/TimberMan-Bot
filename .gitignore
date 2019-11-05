@@ -1,0 +1,13 @@
+# Created by .ignore support plugin (hsz.mobi)
+.gitignore
+.idea/$CACHE_FILE$
+.idea/.gitignore
+.idea/TimberMan-Bot-master.iml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+TimberMan-Bot-master/.gitignore
+TimberMan-Bot-master/README.md
+TimberMan-Bot-master/TimerMan.py
+TimberMan-Bot-master/screenshoter.py
