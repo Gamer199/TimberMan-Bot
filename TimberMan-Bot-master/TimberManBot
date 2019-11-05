@@ -1,0 +1,31 @@
+from PIL import ImageGrab
+import constant
+import pyautogui
+import threading
+
+
+def printit():
+    threading.Timer(5.0, printit).start()
+    px = ImageGrab.grab().load()
+    l = px[675, 655]
+    r = px[1245, 655]
+    left = px(675, 650, 129, 33)
+    right = px(1133, 635, 130, 49)
+    print(left)
+
+    colors = constant.COLORS
+    direction = "right"
+
+    if left in colors:
+        print("left %s" % (left,))
+        direction = "right"
+    elif right in colors:
+        print("right %s" % (right,))
+        direction = "left"
+    else:
+        print("%s %s" % (left, right))
+
+    pyautogui.press(direction)
+
+
+printit()
