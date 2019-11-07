@@ -105,3 +105,10 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+.idea/$CACHE_FILE$
+.idea/.gitignore
+.idea/TimberMan-Bot-master.iml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
