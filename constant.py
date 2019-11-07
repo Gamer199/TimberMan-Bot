@@ -1,3 +1,4 @@
+# author: Gamer199
 SAVANNA = (204, 128, 23)
 OAK = (163, 150, 63)
 NIGHT = (79, 132, 146)

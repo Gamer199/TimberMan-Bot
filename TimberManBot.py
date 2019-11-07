@@ -1,3 +1,6 @@
+# author: Gamer199
+from time import sleep
+
 from PIL import ImageGrab
 import constant
 import pyautogui
@@ -8,18 +11,19 @@ directions = queue.Queue()
 directions.put("right")
 directions.put("right")
 pyautogui.hotkey("alt", "tab")
+sleep(0.5)
 
 
-def startBot():
-    t = threading.Timer(0.28, startBot)
+def startbot():
+    t = threading.Timer(0.28, startbot)
     t.start()
     px = ImageGrab.grab().load()
     
     colors = constant.COLORS
 
-    direction = checkPixel(690, 834, 342, 378, px, colors, "right")
+    direction = checkpixel(690, 834, 342, 378, px, colors, "right")
     if direction is True:
-        direction = checkPixel(1133, 1241, 338, 374, px, colors, "left")
+        direction = checkpixel(1133, 1241, 338, 374, px, colors, "left")
         if direction is True:
             directions.put(direction)
         else:
@@ -33,14 +37,13 @@ def startBot():
         t.cancel()
 
     while directions.qsize() > 2:
+        direction = directions.get()
+        if direction is True:
+            direction = "right"
+        pyautogui.press(direction)
 
-        dire = directions.get()
-        if dire is True:
-            dire = "right"
-        pyautogui.press(dire)
 
-
-def checkPixel(x1, x2, y1, y2, grabber, colors, direction):
+def checkpixel(x1, x2, y1, y2, grabber, colors, direction):
     result = True
     for x in range(x1, x2, 18):
         for y in range(y1, y2, 18):
@@ -49,4 +52,8 @@ def checkPixel(x1, x2, y1, y2, grabber, colors, direction):
     return result
 
 
-startBot()
+startbot()
+
+#2Player Coordinates
+#ImageGrab.grab(bbox=(302, 338, 448, 377))
+#ImageGrab.grab(bbox=(738, 338, 882, 377))
