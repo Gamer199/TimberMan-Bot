@@ -2,21 +2,60 @@ from PIL import ImageGrab
 import constant
 import pyautogui
 import threading
+import queue
+
+directions = queue.Queue()
+directions.put("right")
+directions.put("right")
+pyautogui.hotkey("alt", "tab")
 
 
 def startBot():
-    threading.Timer(0.3, startBot).start()
+    t = threading.Timer(0.35, startBot)
+    t.start()
     px = ImageGrab.grab().load()
     
     colors = constant.COLORS
-    direction = "left"
 
-    for y in range(675, 804, 6):
-        for x in range(650, 688, 6):
-            if px[x, y] in colors:
-                direction = "right"
+    direction = checkPixel(675, 801, 338, 374, px, colors, "right")
+    if direction == "default":
+        direction = checkPixel(1133, 1259, 338, 374, px, colors, "left")
+        if direction == "default":
+            directions.put(direction)
+        else:
+            directions.put(direction)
+            directions.put(direction)
+    else:
+        print("in")
+        directions.put(direction)
+        directions.put(direction)
 
-    pyautogui.press(direction)
+    for x in range(948, 984, 6):
+        for y in range(983, 1043, 6):
+            if px[x, y] == constant.ARROW:
+                t.cancel()
+
+    while directions.qsize() > 2:
+        dire = directions.get()
+        print(dire)
+        if dire == "default":
+            dire = "right"
+        pyautogui.press(dire)
+
+
+def checkPixel(x1, x2, y1, y2, grabber, colors, direction):
+    result = "default"
+    for x in range(x1, x2, 6):
+        for y in range(y1, y2, 6):
+            if grabber[x, y] in colors:
+                result = direction
+    return result
 
 
 startBot()
+
+#im2 = ImageGrab.grab(bbox=(675, 338, 804, 377))
+#im2 = ImageGrab.grab(bbox=(1133, 338, 1263, 377))
+#im2 = ImageGrab.grab(bbox=(948, 983, 987, 1047))
+
+#im2.show()
