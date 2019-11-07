@@ -11,15 +11,15 @@ pyautogui.hotkey("alt", "tab")
 
 
 def startBot():
-    t = threading.Timer(0.3, startBot)
+    t = threading.Timer(0.28, startBot)
     t.start()
     px = ImageGrab.grab().load()
     
     colors = constant.COLORS
 
-    direction = checkPixel(675, 801, 338, 374, px, colors, "right")
+    direction = checkPixel(690, 834, 342, 378, px, colors, "right")
     if direction is True:
-        direction = checkPixel(1133, 1259, 338, 374, px, colors, "left")
+        direction = checkPixel(1133, 1241, 338, 374, px, colors, "left")
         if direction is True:
             directions.put(direction)
         else:
@@ -29,10 +29,8 @@ def startBot():
         directions.put(direction)
         directions.put(direction)
 
-    for x in range(948, 984, 18):
-        for y in range(983, 1043, 18):
-            if px[x, y] == constant.ARROW:
-                t.cancel()
+    if px[966, 1015] == constant.ARROW:
+        t.cancel()
 
     while directions.qsize() > 2:
 
@@ -52,9 +50,3 @@ def checkPixel(x1, x2, y1, y2, grabber, colors, direction):
 
 
 startBot()
-
-#im2 = ImageGrab.grab(bbox=(675, 338, 804, 377))
-#im2 = ImageGrab.grab(bbox=(1133, 338, 1263, 377))
-#im2 = ImageGrab.grab(bbox=(948, 983, 987, 1047))
-
-#im2.show()
