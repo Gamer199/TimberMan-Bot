@@ -22,6 +22,7 @@ import ctypes
 import ctypes.wintypes
 
 import mss
+import numpy as np
 import keyboard
 import constant
 
@@ -191,6 +192,15 @@ def detect_branch_at(img, x_positions, y_pos):
     return False
 
 
+def detect_branch_np(img_arr, x_positions, y_pos):
+    """Fast branch detection using numpy BGRA uint8 array."""
+    for x in x_positions:
+        pixel = (int(img_arr[y_pos, x, 2]), int(img_arr[y_pos, x, 1]), int(img_arr[y_pos, x, 0]))
+        if is_branch_color(pixel):
+            return True
+    return False
+
+
 def learn_background_colors(img, left_xs, right_xs, sample_ys):
     """
     Learn the background color by sampling at multiple y positions
@@ -305,24 +315,24 @@ def run_bot(debug=False):
     while running:
         t_start = time.perf_counter()
 
-        # Capture game window
-        img = sct.grab(monitor)
+        # Capture game window as numpy array (BGRA uint8)
+        img = np.array(sct.grab(monitor))
 
-        # Check game over
-        go_pixel = img.pixel(gameover_x, gameover_y)[:3]
-        if all(abs(go_pixel[i] - constant.ARROW[i]) <= 15 for i in range(3)):
-            print(f"Game Over detected! Total chops: {chop_count}")
+        # Check game over (cast to int to avoid uint8 overflow)
+        go_r, go_g, go_b = int(img[gameover_y, gameover_x, 2]), int(img[gameover_y, gameover_x, 1]), int(img[gameover_y, gameover_x, 0])
+        if abs(go_r - constant.ARROW[0]) <= 15 and abs(go_g - constant.ARROW[1]) <= 15 and abs(go_b - constant.ARROW[2]) <= 15:
+            print(f"Game Over! Score: ~{chop_count - 3} (chops: {chop_count})")
             break
 
-        # Detect branches at each row
+        # Detect branches at each row using numpy
         branches = []  # list of ("left", "right", or None) per row
         for y in row_ys:
             if y < 0 or y >= win_h:
                 branches.append(None)
                 continue
 
-            has_left = detect_branch_at(img, left_check_xs, y)
-            has_right = detect_branch_at(img, right_check_xs, y)
+            has_left = detect_branch_np(img, left_check_xs, y)
+            has_right = detect_branch_np(img, right_check_xs, y)
 
             if has_left:
                 branches.append("left")
@@ -337,6 +347,12 @@ def run_bot(debug=False):
         # Log first 20 chops for debugging
         if chop_count < 20:
             print(f"  Chop {chop_count}: branches={branches} -> {direction}")
+
+        # Wait before pressing key — match game's input timing
+        elapsed = time.perf_counter() - t_start
+        remaining = 0.25 - elapsed
+        if remaining > 0:
+            time.sleep(remaining)
 
         # Press key
         if direction == "left":
@@ -356,9 +372,6 @@ def run_bot(debug=False):
         if chop_count % 200 == 0:
             avg = sum(cycle_times[-200:]) / len(cycle_times[-200:])
             print(f"Chops: {chop_count}, avg cycle: {avg:.1f}ms")
-
-        # Small sleep to avoid overwhelming CPU (tune this for speed vs CPU usage)
-        time.sleep(0.005)
 
     # Print final stats
     if cycle_times:
