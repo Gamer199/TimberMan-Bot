@@ -164,21 +164,24 @@ def detect_biome(img, win_w, win_h):
 
 # Active branch colors (set per round after biome detection)
 _active_colors = constant.BRANCH_COLORS
+_active_tolerance = constant.COLOR_TOLERANCE
 
 
 def set_active_biome(biome_name):
-    """Set active branch colors based on detected biome."""
-    global _active_colors
+    """Set active branch colors and tolerance based on detected biome."""
+    global _active_colors, _active_tolerance
     if biome_name in constant.BIOME_COLORS:
         _active_colors = constant.BIOME_COLORS[biome_name]
     else:
         _active_colors = constant.BRANCH_COLORS
+    _active_tolerance = constant.BIOME_TOLERANCE.get(biome_name, constant.COLOR_TOLERANCE)
 
 
 def is_branch_color(pixel):
     """Check if pixel matches any active branch wood color within tolerance."""
+    tol = _active_tolerance
     for ref in _active_colors:
-        if all(abs(pixel[i] - ref[i]) <= constant.COLOR_TOLERANCE for i in range(3)):
+        if all(abs(pixel[i] - ref[i]) <= tol for i in range(3)):
             return True
     return False
 
@@ -321,7 +324,7 @@ def run_bot(debug=False):
         # Check game over (cast to int to avoid uint8 overflow)
         go_r, go_g, go_b = int(img[gameover_y, gameover_x, 2]), int(img[gameover_y, gameover_x, 1]), int(img[gameover_y, gameover_x, 0])
         if abs(go_r - constant.ARROW[0]) <= 15 and abs(go_g - constant.ARROW[1]) <= 15 and abs(go_b - constant.ARROW[2]) <= 15:
-            print(f"Game Over! Score: ~{chop_count - 3} (chops: {chop_count})")
+            print(f"Game Over! Score: ~{chop_count - 4} (chops: {chop_count})")
             break
 
         # Detect branches at each row using numpy
@@ -350,7 +353,7 @@ def run_bot(debug=False):
 
         # Wait before pressing key — match game's input timing
         elapsed = time.perf_counter() - t_start
-        remaining = 0.25 - elapsed
+        remaining = 0.20 - elapsed
         if remaining > 0:
             time.sleep(remaining)
 

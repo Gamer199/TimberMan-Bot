@@ -9,8 +9,13 @@ ARROWCOLOR = [ARROW]
 
 # --- V2 Bot constants ---
 
-# Branch detection color tolerance (RGB Euclidean distance)
+# Branch detection color tolerance (per-component max difference)
 COLOR_TOLERANCE = 25
+
+# Per-biome tolerance overrides (some biomes need tighter matching)
+BIOME_TOLERANCE = {
+    "taiga": 8,  # Taiga sky gradient is very close to branch color
+}
 
 # Additional branch colors observed in screenshots (edges, highlights)
 SAVANNA_LIGHT = (235, 167, 73)
@@ -24,6 +29,8 @@ CITY = (91, 200, 196)
 CITY_DARK = (73, 170, 168)
 CANDY = (241, 139, 71)
 CANDY_LIGHT = (255, 170, 113)
+FOREST = (51, 176, 123)
+FOREST_LIGHT = (56, 219, 150)
 
 BRANCH_COLORS = [
     SAVANNA, SAVANNA_LIGHT, SAVANNA_DARK,
@@ -32,6 +39,7 @@ BRANCH_COLORS = [
     TAIGA, TAIGA_LIGHT,
     CITY, CITY_DARK,
     CANDY, CANDY_LIGHT,
+    FOREST, FOREST_LIGHT,
 ]
 
 # Per-biome color groups (used after biome auto-detection to avoid cross-biome false positives)
@@ -42,6 +50,7 @@ BIOME_COLORS = {
     "taiga": [TAIGA, TAIGA_LIGHT],
     "city": [CITY, CITY_DARK],
     "candy": [CANDY, CANDY_LIGHT],
+    "forest": [FOREST, FOREST_LIGHT],
 }
 
 # Sky reference colors per biome (sampled at x=400, y=50 - reliable sky position)
@@ -53,6 +62,7 @@ BIOME_SKY = {
     "taiga": (32, 57, 83),
     "city": (141, 55, 128),
     "candy": (53, 206, 252),
+    "forest": (133, 181, 255),
 }
 
 # Sky sample position for biome detection (fraction of window width/height)
