@@ -353,7 +353,7 @@ def run_bot(debug=False):
 
         # Wait before pressing key — match game's input timing
         elapsed = time.perf_counter() - t_start
-        remaining = 0.20 - elapsed
+        remaining = 0.14 - elapsed
         if remaining > 0:
             time.sleep(remaining)
 
