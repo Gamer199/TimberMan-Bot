@@ -261,13 +261,30 @@ def run_bot(debug=False):
     print(f"Branch row Y positions:  {row_ys}")
     print(f"Game over check: ({gameover_x}, {gameover_y})")
 
-    # Screen capture region (the game window)
+    # Full window capture (used for biome detection and debug)
     monitor = {
         "left": win_x,
         "top": win_y,
         "width": win_w,
         "height": win_h,
     }
+
+    # Smaller capture region for main loop (only the area we need)
+    # Covers branch check positions + game over pixel
+    min_x = min(left_check_xs) - 5
+    max_x = max(right_check_xs) + 5
+    min_y = min(row_ys) - 5
+    max_y = gameover_y + 5  # Include game over pixel
+    monitor_small = {
+        "left": win_x + min_x,
+        "top": win_y + min_y,
+        "width": max_x - min_x,
+        "height": max_y - min_y,
+    }
+    # Offsets to convert from full-window coords to small-region coords
+    ox, oy = min_x, min_y
+    print(f"Optimized capture: {max_x - min_x}x{max_y - min_y} "
+          f"(vs {win_w}x{win_h} full window)")
 
     sct = mss.mss()
 
@@ -318,24 +335,28 @@ def run_bot(debug=False):
     while running:
         t_start = time.perf_counter()
 
-        # Capture game window as numpy array (BGRA uint8)
-        img = np.array(sct.grab(monitor))
+        # Capture only the region we need (much smaller than full window)
+        img = np.array(sct.grab(monitor_small))
 
-        # Check game over (cast to int to avoid uint8 overflow)
-        go_r, go_g, go_b = int(img[gameover_y, gameover_x, 2]), int(img[gameover_y, gameover_x, 1]), int(img[gameover_y, gameover_x, 0])
+        # Check game over (coords offset to small region)
+        gy, gx = gameover_y - oy, gameover_x - ox
+        go_r, go_g, go_b = int(img[gy, gx, 2]), int(img[gy, gx, 1]), int(img[gy, gx, 0])
         if abs(go_r - constant.ARROW[0]) <= 15 and abs(go_g - constant.ARROW[1]) <= 15 and abs(go_b - constant.ARROW[2]) <= 15:
             print(f"Game Over! Score: ~{chop_count - 4} (chops: {chop_count})")
             break
 
-        # Detect branches at each row using numpy
-        branches = []  # list of ("left", "right", or None) per row
+        # Detect branches at each row (coords offset to small region)
+        branches = []
         for y in row_ys:
-            if y < 0 or y >= win_h:
+            sy = y - oy
+            if sy < 0 or sy >= img.shape[0]:
                 branches.append(None)
                 continue
 
-            has_left = detect_branch_np(img, left_check_xs, y)
-            has_right = detect_branch_np(img, right_check_xs, y)
+            left_xs_off = [x - ox for x in left_check_xs]
+            right_xs_off = [x - ox for x in right_check_xs]
+            has_left = detect_branch_np(img, left_xs_off, sy)
+            has_right = detect_branch_np(img, right_xs_off, sy)
 
             if has_left:
                 branches.append("left")
